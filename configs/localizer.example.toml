@@ -1,0 +1,27 @@
+[paths]
+source_dir = "data/source"
+work_dir = "work"
+output_dir = "output"
+glossary = "examples/glossary.zh-ru.csv"
+
+[ocr]
+backend = "json"
+render_dpi = 240
+languages = ["chi_sim", "eng"]
+
+[translation]
+source_language = "zh"
+target_language = "ru"
+fallback = "mark-todo"
+use_environment_api_keys = true
+
+[render]
+strategy = "overlay"
+font_family = "Arial"
+min_font_size = 6
+max_font_size = 16
+
+[qa]
+residual_cjk = true
+contact_sheet = true
+max_package_file_mb = 50

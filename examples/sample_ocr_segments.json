@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "source": "synthetic-sample",
+  "segments": [
+    {
+      "page": 1,
+      "text": "产品选型手册",
+      "bbox": [72, 64, 230, 92],
+      "confidence": 0.98
+    },
+    {
+      "page": 1,
+      "text": "额定电压",
+      "bbox": [72, 132, 160, 152],
+      "confidence": 0.94
+    },
+    {
+      "page": 1,
+      "text": "12 kV",
+      "bbox": [176, 132, 230, 152],
+      "confidence": 0.99
+    },
+    {
+      "page": 1,
+      "text": "防护等级",
+      "bbox": [72, 168, 160, 188],
+      "confidence": 0.95
+    },
+    {
+      "page": 1,
+      "text": "IP4X",
+      "bbox": [176, 168, 226, 188],
+      "confidence": 0.99
+    },
+    {
+      "page": 2,
+      "text": "正常使用条件",
+      "bbox": [72, 64, 210, 88],
+      "confidence": 0.96
+    },
+    {
+      "page": 2,
+      "text": "安装说明",
+      "bbox": [72, 120, 168, 144],
+      "confidence": 0.97
+    }
+  ]
+}

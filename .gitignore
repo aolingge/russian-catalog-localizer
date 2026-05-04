@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local configs and secrets
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+*secret*
+*credentials*
+
+# Large/private catalog inputs and generated artifacts
+data/
+work/
+output/
+release/
+demo-output/
+*.pdf
+*.zip
+*.7z
+*.rar
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+
+# Keep explicit docs/examples when intentionally added
+!docs/**/*.png
+!docs/**/*.jpg
+!examples/**/*.json
+!examples/**/*.csv
