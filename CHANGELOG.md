@@ -4,6 +4,23 @@ All notable changes to this project will be documented here.
 
 The format follows Keep a Changelog, and this project uses semantic versioning once releases begin.
 
+## [0.2.0] - 2026-05-05
+
+### Added
+
+- Chinese Tkinter desktop app for one-click demo and guided workflow runs.
+- Windows PyInstaller packaging script that builds a standalone EXE customer bundle.
+- Chinese customer quick-start documentation.
+- Shared workflow module used by CLI and GUI.
+- Package smoke-test mode for the desktop executable.
+
+### Changed
+
+- CLI workflow now calls the shared workflow implementation.
+- Safe packager excludes more private file types, including `.env*`, PDFs, images, and archive files.
+- Customer-facing documentation now states the exact desktop entry point, required inputs, output folder contents, Demo flow, current PDF/OCR limitations, and private-data exclusions.
+- `localized_package.zip` now contains sanitized sharing artifacts instead of full working files.
+
 ## [0.1.0] - 2026-05-05
 
 ### Added

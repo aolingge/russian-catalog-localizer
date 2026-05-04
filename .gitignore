@@ -30,6 +30,7 @@ work/
 output/
 release/
 demo-output/
+scripts/ralph/
 *.pdf
 *.zip
 *.7z

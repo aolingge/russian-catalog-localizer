@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "russian-catalog-localizer"
-version = "0.1.0"
-description = "Local-first Chinese to Russian catalog localization pipeline skeleton."
+version = "0.2.0"
+description = "Chinese desktop app and local-first pipeline for Chinese to Russian catalog localization."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -33,6 +33,7 @@ qa = ["pillow>=10.0"]
 
 [project.scripts]
 rcl = "russian_catalog_localizer.cli:main"
+rcl-gui = "russian_catalog_localizer.desktop_app:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/russian_catalog_localizer"]
@@ -47,6 +48,7 @@ include = [
   "/examples",
   "/src",
   "/tests",
+  "/tools",
 ]
 
 [tool.ruff]

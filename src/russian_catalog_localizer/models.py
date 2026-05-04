@@ -12,7 +12,7 @@ class Box:
     y1: float
 
     @classmethod
-    def from_value(cls, value: Any) -> "Box":
+    def from_value(cls, value: Any) -> Box:
         if isinstance(value, dict):
             return cls(
                 float(value["x0"]),
@@ -39,7 +39,7 @@ class Segment:
     notes: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Segment":
+    def from_dict(cls, data: dict[str, Any]) -> Segment:
         bbox = data.get("bbox", data.get("box"))
         if bbox is None:
             raise ValueError(f"Segment is missing bbox: {data!r}")

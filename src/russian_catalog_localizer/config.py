@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-import tomllib
 
 
 @dataclass(frozen=True)
@@ -16,7 +16,7 @@ class PipelineConfig:
     max_package_file_mb: float = 50.0
 
     @classmethod
-    def from_toml(cls, path: Path) -> "PipelineConfig":
+    def from_toml(cls, path: Path) -> PipelineConfig:
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         paths = data.get("paths", {})
         ocr = data.get("ocr", {})

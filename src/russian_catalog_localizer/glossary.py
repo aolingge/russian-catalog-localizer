@@ -24,7 +24,9 @@ def load_glossary(path: Path) -> list[GlossaryEntry]:
             target = (row.get("target") or "").strip()
             if not source or not target:
                 continue
-            entries.append(GlossaryEntry(source=source, target=target, note=(row.get("note") or "")))
+            entries.append(
+                GlossaryEntry(source=source, target=target, note=(row.get("note") or ""))
+            )
     return entries
 
 

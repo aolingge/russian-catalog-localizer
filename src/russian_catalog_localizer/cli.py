@@ -4,33 +4,19 @@ import argparse
 from importlib.resources import as_file, files
 from pathlib import Path
 
-from .glossary import load_glossary, localize_segments
 from .ocr import load_segments, normalize_segments, write_segments
 from .packager import pack_directory
 from .qa import write_report
 from .renderer import write_repaint_plan
+from .workflow import run_localization_workflow
 
 
 def run_workflow(segments_path: Path, glossary_path: Path, out_dir: Path) -> None:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    segments = normalize_segments(load_segments(segments_path))
-    glossary = load_glossary(glossary_path)
-    localized = localize_segments(segments, glossary)
-
-    localized_path = out_dir / "segments.ru.json"
-    repaint_path = out_dir / "repaint_plan.json"
-    qa_path = out_dir / "qa_report.md"
-    package_path = out_dir / "localized_package.zip"
-
-    write_segments(localized_path, localized, source="localized")
-    write_repaint_plan(repaint_path, localized)
-    write_report(qa_path, localized)
-    added = pack_directory(out_dir, package_path)
-
-    print(f"Wrote {localized_path}")
-    print(f"Wrote {repaint_path}")
-    print(f"Wrote {qa_path}")
-    print(f"Wrote {package_path} ({len(added)} files)")
+    result = run_localization_workflow(segments_path, glossary_path, out_dir)
+    print(f"Wrote {result.localized_segments}")
+    print(f"Wrote {result.repaint_plan}")
+    print(f"Wrote {result.qa_report}")
+    print(f"Wrote {result.package_zip} ({len(result.packaged_files)} files)")
 
 
 def cmd_demo(args: argparse.Namespace) -> None:
@@ -96,7 +82,10 @@ def build_parser() -> argparse.ArgumentParser:
     workflow.add_argument("--out", type=Path, required=True)
     workflow.set_defaults(func=cmd_workflow)
 
-    render_plan = subparsers.add_parser("render-plan", help="Write a renderer-neutral repaint plan.")
+    render_plan = subparsers.add_parser(
+        "render-plan",
+        help="Write a renderer-neutral repaint plan.",
+    )
     render_plan.add_argument("--segments", type=Path, required=True)
     render_plan.add_argument("--out", type=Path, required=True)
     render_plan.set_defaults(func=cmd_render_plan)
