@@ -7,8 +7,11 @@ from tempfile import TemporaryDirectory
 
 from russian_catalog_localizer.desktop_app import (
     build_qa_summary,
+    build_result_message,
+    default_output_dir,
     demo_resource_paths,
     run_desktop_workflow,
+    validate_workflow_inputs,
 )
 
 
@@ -28,6 +31,9 @@ class DesktopAppTests(unittest.TestCase):
             self.assertEqual(result.residual_cjk_count, 0)
             self.assertIn("QA 摘要", result.qa_summary)
             self.assertIn("残留中文: 0", result.qa_summary)
+            message = build_result_message(result)
+            self.assertIn("脱敏分享包", message)
+            self.assertIn("下一步", message)
 
     def test_build_qa_summary_uses_report_lines(self) -> None:
         with TemporaryDirectory() as tmp:
@@ -73,6 +79,33 @@ class DesktopAppTests(unittest.TestCase):
 
             self.assertEqual(actual, expected)
             self.assertTrue(glossary_path.name.endswith(".csv"))
+
+    def test_validate_workflow_inputs_returns_paths(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            segments = root / "segments.json"
+            glossary = root / "glossary.csv"
+            out_dir = root / "out"
+            segments.write_text('{"segments":[]}\n', encoding="utf-8")
+            glossary.write_text("source,target\n", encoding="utf-8")
+
+            result = validate_workflow_inputs(str(segments), str(glossary), str(out_dir))
+
+            self.assertEqual(result.segments_path, segments)
+            self.assertEqual(result.glossary_path, glossary)
+            self.assertEqual(result.output_dir, out_dir)
+
+    def test_validate_workflow_inputs_reports_actionable_errors(self) -> None:
+        with self.assertRaises(ValueError) as context:
+            validate_workflow_inputs("", "", "")
+
+        message = str(context.exception)
+        self.assertIn("请选择 OCR JSON 文件", message)
+        self.assertIn("请选择术语表 CSV 文件", message)
+        self.assertIn("请选择输出目录", message)
+
+    def test_default_output_dir_is_customer_named(self) -> None:
+        self.assertIn("俄文目录", str(default_output_dir()))
 
 
 if __name__ == "__main__":

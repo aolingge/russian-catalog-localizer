@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 The format follows Keep a Changelog, and this project uses semantic versioning once releases begin.
 
+## [0.2.1] - 2026-05-05
+
+### Changed
+
+- Redesigned the Chinese desktop app into a simpler three-step workspace.
+- Added clearer input state labels, result cards, progress feedback, QA opening, and share-package path copying.
+- Updated customer wording to match the polished buttons: `试运行 Demo`, `开始生成`, `打开输出`, and `打开 QA`.
+
 ## [0.2.0] - 2026-05-05
 
 ### Added

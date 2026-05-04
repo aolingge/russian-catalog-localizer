@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "russian-catalog-localizer"
-version = "0.2.0"
+version = "0.2.1"
 description = "Chinese desktop app and local-first pipeline for Chinese to Russian catalog localization."
 readme = "README.md"
 requires-python = ">=3.11"

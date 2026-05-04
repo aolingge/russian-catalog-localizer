@@ -18,10 +18,10 @@ For non-technical Windows users, download the Windows package from the latest Gi
 
 In the app:
 
-1. Click `运行示例 Demo` first to verify the package.
+1. Click `试运行 Demo` first to verify the package.
 2. For real data, select `OCR JSON`, `术语表 CSV`, and `输出目录`.
-3. Click `运行 Workflow`.
-4. Click `打开输出目录` to view the generated files.
+3. Click `开始生成`.
+4. Click `打开输出` or `打开 QA` to view the generated files.
 
 Inputs:
 

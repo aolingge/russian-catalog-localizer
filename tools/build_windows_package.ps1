@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string] $PackageName = "russian-catalog-localizer-desktop-v0.2.0-windows",
+    [string] $PackageName = "russian-catalog-localizer-desktop-v0.2.1-windows",
     [string] $OutDir = "release",
     [switch] $NoZip,
     [switch] $SkipExeBuild,
@@ -64,8 +64,8 @@ function Write-PackageReadme {
         ''
         '1. Extract this folder.'
         '2. Double-click `CatalogLocalizer.exe`.'
-        '3. Click the Chinese `Run Demo` button in the app.'
-        '4. For real data, select OCR JSON, glossary CSV, and an output folder.'
+        '3. Click the Chinese `试运行 Demo` button in the app.'
+        '4. For real data, select OCR JSON, glossary CSV, and an output folder, then click `开始生成`.'
         ''
         '## What this version does'
         ''

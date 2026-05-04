@@ -6,12 +6,12 @@
 
 ## 最简单用法
 
-1. 解压 `russian-catalog-localizer-desktop-v0.2.0-windows.zip`。
+1. 解压 `russian-catalog-localizer-desktop-v0.2.1-windows.zip`。
 2. 双击 `CatalogLocalizer.exe`。
-3. 界面打开后会显示 `俄文目录本地化工具`。第一次使用请先点 `运行示例 Demo`。
-4. Demo 会自动使用内置示例数据。如果没有先选择输出目录，结果会写到当前目录下的 `demo-output` 文件夹。
+3. 界面打开后会显示 `俄文目录本地化助手`。第一次使用请先点 `试运行 Demo`。
+4. Demo 会自动使用内置示例数据。输出目录默认是文档目录下的 `俄文目录输出` 文件夹。
 5. 如果 QA 摘要里显示 `残留中文: 0`，并列出四个输出文件，说明软件运行正常。
-6. 点 `打开输出目录` 可以查看 Demo 结果。
+6. 点 `打开输出` 可以查看 Demo 结果；点 `打开 QA` 可以直接看检查报告。
 
 ## 处理客户自己的数据
 
@@ -22,11 +22,11 @@
 
 在桌面助手里按顺序选择：
 
-1. `OCR JSON` 这一行点 `选择`，选 OCR JSON 文件。
-2. `术语表 CSV` 这一行点 `选择`，选术语表 CSV 文件。
-3. `输出目录` 这一行点 `选择`，选一个用于保存结果的文件夹。
-4. 点 `运行 Workflow`。
-5. 完成后点 `打开输出目录` 查看结果。
+1. `OCR JSON` 这一行点 `选择 JSON`，选 OCR JSON 文件。
+2. `术语表 CSV` 这一行点 `选择 CSV`，选术语表 CSV 文件。
+3. `输出目录` 这一行可以保留默认目录，也可以点 `选择文件夹` 换位置。
+4. 文件都显示 `已选择` 后，点 `开始生成`。
+5. 完成后点 `打开输出` 查看结果，或点 `复制分享包路径` 发给后续人员。
 
 `OCR JSON = 带页码和坐标的文字块文件 / 由 OCR 或 PDF 文本提取工具生成 / 软件根据它生成俄文文本和重绘计划。`
 
@@ -68,8 +68,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_windows_packag
 
 默认输出：
 
-- `release\russian-catalog-localizer-desktop-v0.2.0-windows\`
-- `release\russian-catalog-localizer-desktop-v0.2.0-windows.zip`
+- `release\russian-catalog-localizer-desktop-v0.2.1-windows\`
+- `release\russian-catalog-localizer-desktop-v0.2.1-windows.zip`
 
 打包脚本会自动构建独立 EXE，并运行一次内置 demo smoke test。
 
@@ -78,7 +78,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build_windows_packag
 ## 交付前检查
 
 - 解压 zip 后双击 EXE 可打开中文界面。
-- 点 `运行示例 Demo` 后能生成四个输出文件。
+- 点 `试运行 Demo` 后能生成四个输出文件。
 - `qa_report.md` 显示 `Residual Chinese hits: 0`。
 - `localized_package.zip` 里只包含脱敏后的 `qa_report.md`、`repaint_plan.json`、`segments.ru.json`。
 - 打开 `localized_package.zip` 抽查，里面不能出现客户原 OCR 中文、中文源术语、真实术语表或 `source_text` 字段。
