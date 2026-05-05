@@ -165,6 +165,99 @@ function Get-ProcessOutputTail {
     return (Get-Content -LiteralPath $Path -Tail $LineCount) -join [Environment]::NewLine
 }
 
+function Join-ProcessArguments {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]] $Arguments
+    )
+
+    return ($Arguments | ForEach-Object {
+        if ($_ -match '[\s"]') {
+            '"' + ($_ -replace '"', '\"') + '"'
+        } else {
+            $_
+        }
+    }) -join " "
+}
+
+function Invoke-PackageCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Label,
+        [Parameter(Mandatory = $true)]
+        [string[]] $Arguments,
+        [Parameter(Mandatory = $true)]
+        [string] $StdoutLog,
+        [Parameter(Mandatory = $true)]
+        [string] $StderrLog
+    )
+
+    Remove-Item -LiteralPath $StdoutLog, $StderrLog -Force -ErrorAction SilentlyContinue
+
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = $PackageExe
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.CreateNoWindow = $true
+    $startInfo.Arguments = Join-ProcessArguments -Arguments $Arguments
+    $startInfo.EnvironmentVariables["PYTHONUTF8"] = "1"
+    $startInfo.EnvironmentVariables["PYTHONIOENCODING"] = "utf-8"
+    try {
+        $startInfo.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+        $startInfo.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+    } catch {
+        Write-Verbose "This PowerShell runtime does not support explicit process output encoding."
+    }
+
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    [void] $process.Start()
+    $stdout = $process.StandardOutput.ReadToEnd()
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+
+    Set-Content -LiteralPath $StdoutLog -Value $stdout -Encoding UTF8
+    Set-Content -LiteralPath $StderrLog -Value $stderr -Encoding UTF8
+
+    if ($process.ExitCode -ne 0) {
+        $stdoutTail = Get-ProcessOutputTail -Path $StdoutLog
+        $stderrTail = Get-ProcessOutputTail -Path $StderrLog
+        throw "$Label failed with exit code $($process.ExitCode).`nSTDOUT:`n$stdoutTail`nSTDERR:`n$stderrTail"
+    }
+}
+
+function Test-ZipRequiredEntries {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $ZipPath,
+        [Parameter(Mandatory = $true)]
+        [string[]] $RequiredEntries
+    )
+
+    if (-not (Test-Path -LiteralPath $ZipPath)) {
+        throw "Zip is missing: $ZipPath"
+    }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($ZipPath)
+    try {
+        $entries = @{}
+        foreach ($entry in $archive.Entries) {
+            $entries[$entry.FullName] = $true
+            $entries[$entry.FullName -replace '/', '\'] = $true
+        }
+
+        foreach ($required in $RequiredEntries) {
+            if (-not $entries.ContainsKey($required)) {
+                throw "Zip entry is missing from $(Split-Path -Leaf $ZipPath): $required"
+            }
+        }
+    } finally {
+        $archive.Dispose()
+    }
+}
+
 function Invoke-PyInstallerBuild {
     if ($SkipExeBuild) {
         Write-Host "Skipping PyInstaller build."
@@ -225,34 +318,22 @@ function Test-Smoke {
     }
     New-Item -ItemType Directory -Path $smokeDir -Force | Out-Null
 
-    $stdoutLog = Join-Path $ReleaseRoot "_smoke_stdout.log"
-    $stderrLog = Join-Path $ReleaseRoot "_smoke_stderr.log"
-    Remove-Item -LiteralPath $stdoutLog, $stderrLog -Force -ErrorAction SilentlyContinue
+    $tkStdoutLog = Join-Path $ReleaseRoot "_smoke_tk_stdout.log"
+    $tkStderrLog = Join-Path $ReleaseRoot "_smoke_tk_stderr.log"
+    $demoStdoutLog = Join-Path $ReleaseRoot "_smoke_demo_stdout.log"
+    $demoStderrLog = Join-Path $ReleaseRoot "_smoke_demo_stderr.log"
 
-    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
-    $startInfo.FileName = $PackageExe
-    $startInfo.UseShellExecute = $false
-    $startInfo.RedirectStandardOutput = $true
-    $startInfo.RedirectStandardError = $true
-    $startInfo.CreateNoWindow = $true
-    $escapedSmokeDir = $smokeDir -replace '"', '\"'
-    $startInfo.Arguments = "--demo-out `"$escapedSmokeDir`""
+    Invoke-PackageCommand `
+        -Label "Packaged Tcl/Tk runtime smoke test" `
+        -Arguments @("--tk-smoke") `
+        -StdoutLog $tkStdoutLog `
+        -StderrLog $tkStderrLog
 
-    $process = [System.Diagnostics.Process]::new()
-    $process.StartInfo = $startInfo
-    [void] $process.Start()
-    $stdout = $process.StandardOutput.ReadToEnd()
-    $stderr = $process.StandardError.ReadToEnd()
-    $process.WaitForExit()
-
-    Set-Content -LiteralPath $stdoutLog -Value $stdout -Encoding UTF8
-    Set-Content -LiteralPath $stderrLog -Value $stderr -Encoding UTF8
-
-    if ($process.ExitCode -ne 0) {
-        $stdoutTail = Get-ProcessOutputTail -Path $stdoutLog
-        $stderrTail = Get-ProcessOutputTail -Path $stderrLog
-        throw "Packaged executable smoke test failed with exit code $($process.ExitCode).`nSTDOUT:`n$stdoutTail`nSTDERR:`n$stderrTail"
-    }
+    Invoke-PackageCommand `
+        -Label "Packaged demo workflow smoke test" `
+        -Arguments @("--demo-out", $smokeDir) `
+        -StdoutLog $demoStdoutLog `
+        -StderrLog $demoStderrLog
 
     $expected = @("segments.ru.json", "repaint_plan.json", "qa_report.md", "localized_package.zip")
     foreach ($name in $expected) {
@@ -267,9 +348,15 @@ function Test-Smoke {
         throw "Smoke QA did not pass residual Chinese check."
     }
 
+    Test-ZipRequiredEntries `
+        -ZipPath (Join-Path $smokeDir "localized_package.zip") `
+        -RequiredEntries @("qa_report.md", "repaint_plan.json", "segments.ru.json")
+
     Remove-Item -LiteralPath $smokeDir -Recurse -Force
-    Write-Host "Smoke stdout: $stdoutLog"
-    Write-Host "Smoke stderr: $stderrLog"
+    Write-Host "Tk smoke stdout: $tkStdoutLog"
+    Write-Host "Tk smoke stderr: $tkStderrLog"
+    Write-Host "Demo smoke stdout: $demoStdoutLog"
+    Write-Host "Demo smoke stderr: $demoStderrLog"
 }
 
 Write-Host "Building desktop customer package..."
@@ -309,6 +396,19 @@ if (-not $NoZip) {
         Remove-Item -LiteralPath $ZipPath -Force
     }
     Compress-Archive -Path (Join-Path $PackageDir "*") -DestinationPath $ZipPath -Force
+    Test-ZipRequiredEntries `
+        -ZipPath $ZipPath `
+        -RequiredEntries @(
+            "CatalogLocalizer.exe",
+            "run_app.bat",
+            "README.md",
+            "README.customer.md",
+            "LICENSE",
+            "docs\customer-quick-start.zh-CN.md",
+            "examples\sample_ocr_segments.json",
+            "examples\glossary.zh-ru.csv",
+            "configs\localizer.example.toml"
+        )
     Write-Host "Wrote zip: $ZipPath"
 }
 
