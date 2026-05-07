@@ -43,7 +43,7 @@ def default_output_dir() -> Path:
     documents = Path.home() / "Documents"
     if documents.exists():
         return documents / DEFAULT_OUTPUT_FOLDER
-    return Path.cwd() / "desktop-output"
+    return Path.cwd() / DEFAULT_OUTPUT_FOLDER
 
 
 def validate_workflow_inputs(

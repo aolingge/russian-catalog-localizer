@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "russian-catalog-localizer"
 version = "0.2.1"
-description = "Chinese desktop app and local-first pipeline for Chinese to Russian catalog localization."
+description = "Chinese-to-Russian product catalog localization assistant with OCR export normalization, glossary handling, QA, and privacy-safe release packaging."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 authors = [
   { name = "Russian Catalog Localizer contributors" }
 ]
-keywords = ["ocr", "catalog", "localization", "russian", "pdf"]
+keywords = ["ocr", "catalog", "localization", "russian", "i18n", "desktop-app", "privacy"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
