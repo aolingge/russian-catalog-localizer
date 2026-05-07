@@ -1,0 +1,26 @@
+name: Privacy or packaging issue
+description: Report a packaging, redaction, or release-safety problem
+title: "[privacy] "
+labels: ["privacy", "release"]
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue
+      description: What privacy or packaging behavior looks wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Use synthetic or redacted examples only.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: I removed customer PDFs, OCR text, real glossaries, credentials, private paths, and private account data.
+          required: true

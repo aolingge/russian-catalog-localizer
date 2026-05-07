@@ -1,5 +1,7 @@
 # Russian Catalog Localizer
 
+Languages: English | [简体中文](README.zh-CN.md)
+
 Open-source skeleton and Chinese Windows desktop assistant for localizing Chinese product-catalog OCR exports into Russian without committing private source PDFs, customer data, API keys, or large binary artifacts.
 
 The pipeline shape is:
